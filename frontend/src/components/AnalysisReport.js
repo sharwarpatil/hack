@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   Box,
   Heading,
@@ -40,21 +40,21 @@ import {
   TabPanels,
   Tab,
   TabPanel,
-} from '@chakra-ui/react';
-import { 
-  DownloadIcon, 
-  WarningTwoIcon, 
-  CheckCircleIcon, 
-  InfoIcon, 
-  TimeIcon
-} from '@chakra-ui/icons';
+} from "@chakra-ui/react";
+import {
+  DownloadIcon,
+  WarningTwoIcon,
+  CheckCircleIcon,
+  InfoIcon,
+  TimeIcon,
+} from "@chakra-ui/icons";
 
 const severityColors = {
-  high: 'red',
-  medium: 'orange',
-  low: 'blue',
-  clean: 'green',
-  unknown: 'gray'
+  high: "red",
+  medium: "orange",
+  low: "blue",
+  clean: "green",
+  unknown: "gray",
 };
 
 const StatusBadge = ({ status }) => {
@@ -62,24 +62,24 @@ const StatusBadge = ({ status }) => {
   let icon;
 
   switch (status) {
-    case 'completed':
-      color = 'green';
+    case "completed":
+      color = "green";
       icon = CheckCircleIcon;
       break;
-    case 'processing':
-      color = 'blue';
+    case "processing":
+      color = "blue";
       icon = TimeIcon;
       break;
-    case 'queued':
-      color = 'yellow';
+    case "queued":
+      color = "yellow";
       icon = TimeIcon;
       break;
-    case 'failed':
-      color = 'red';
+    case "failed":
+      color = "red";
       icon = WarningTwoIcon;
       break;
     default:
-      color = 'gray';
+      color = "gray";
       icon = InfoIcon;
   }
 
@@ -93,28 +93,35 @@ const StatusBadge = ({ status }) => {
 
 const AnalysisReport = ({ analysis, status, taskId }) => {
   const [activeTab, setActiveTab] = useState(0);
-  const bg = useColorModeValue('white', 'gray.800');
-  const borderColor = useColorModeValue('gray.200', 'gray.700');
-  
-  if (!analysis && status !== 'completed') {
+  const bg = useColorModeValue("white", "gray.800");
+  const borderColor = useColorModeValue("gray.200", "gray.700");
+
+  if (!analysis && status !== "completed") {
     // Show loading/status screen
     return (
       <Box p={5} shadow="md" borderWidth="1px" borderRadius="lg" bg={bg}>
         <Flex direction="column" align="center" justify="center" py={10}>
           <StatusBadge status={status} />
-          
+
           <Box mt={6} textAlign="center">
-            <Heading size="md" mb={4}>Analysis {status}</Heading>
+            <Heading size="md" mb={4}>
+              Analysis {status}
+            </Heading>
             <Text mb={6}>Task ID: {taskId}</Text>
-            
-            {status === 'processing' && (
+
+            {status === "processing" && (
               <Box w="100%" maxW="500px" mx="auto">
                 <Text mb={2}>Analysis in progress</Text>
-                <Progress size="lg" isIndeterminate colorScheme="blue" borderRadius="md" />
+                <Progress
+                  size="lg"
+                  isIndeterminate
+                  colorScheme="blue"
+                  borderRadius="md"
+                />
               </Box>
             )}
-            
-            {status === 'failed' && (
+
+            {status === "failed" && (
               <Alert status="error" borderRadius="md" maxW="500px" mx="auto">
                 <AlertIcon />
                 Analysis failed. Please try uploading the file again.
@@ -125,7 +132,7 @@ const AnalysisReport = ({ analysis, status, taskId }) => {
       </Box>
     );
   }
-  
+
   if (!analysis) {
     return (
       <Box p={5} shadow="md" borderWidth="1px" borderRadius="lg" bg={bg}>
@@ -136,63 +143,61 @@ const AnalysisReport = ({ analysis, status, taskId }) => {
       </Box>
     );
   }
-  
-  const { 
-    file_info, 
-    malware_score, 
-    malware_category, 
-    severity, 
-    confidence, 
-    analysis_time, 
+
+  const {
+    file_info,
+    malware_score,
+    malware_category,
+    severity,
+    confidence,
+    analysis_time,
     indicators = [],
     exe_details = null,
     pdf_details = null,
     static_analysis_summary,
     malware_family,
-    recommendation
+    recommendation,
   } = analysis;
-  
+
   const getScoreColor = (score) => {
-    if (score < 0.2) return 'green';
-    if (score < 0.5) return 'blue';
-    if (score < 0.8) return 'orange';
-    return 'red';
+    if (score < 0.2) return "green";
+    if (score < 0.5) return "blue";
+    if (score < 0.8) return "orange";
+    return "red";
   };
-  
+
   const formatFileSize = (bytes) => {
-    if (bytes < 1024) return bytes + ' B';
-    else if (bytes < 1048576) return (bytes / 1024).toFixed(2) + ' KB';
-    else return (bytes / 1048576).toFixed(2) + ' MB';
+    if (bytes < 1024) return bytes + " B";
+    else if (bytes < 1048576) return (bytes / 1024).toFixed(2) + " KB";
+    else return (bytes / 1048576).toFixed(2) + " MB";
   };
-  
+
   return (
-    <Box 
-      p={5} 
-      shadow="md" 
-      borderWidth="1px" 
-      borderRadius="lg" 
+    <Box
+      p={5}
+      shadow="md"
+      borderWidth="1px"
+      borderRadius="lg"
       bg={bg}
       borderColor={borderColor}
     >
       {/* Header with verdict */}
-      <Flex 
-        justifyContent="space-between" 
+      <Flex
+        justifyContent="space-between"
         alignItems="flex-start"
-        direction={{ base: 'column', md: 'row' }}
+        direction={{ base: "column", md: "row" }}
         mb={4}
       >
         <Box mb={{ base: 4, md: 0 }}>
           <Heading size="lg" mb={2}>
             Analysis Report
           </Heading>
-          <Text color="gray.500">
-            Task ID: {taskId}
-          </Text>
+          <Text color="gray.500">Task ID: {taskId}</Text>
           <Text color="gray.500">
             Analyzed: {new Date(analysis_time).toLocaleString()}
           </Text>
         </Box>
-        
+
         <Box>
           <Button
             as="a"
@@ -220,41 +225,35 @@ const AnalysisReport = ({ analysis, status, taskId }) => {
           </Button>
         </Box>
       </Flex>
-      
+
       {/* Verdict */}
-      <Box 
-        p={4} 
-        bg={useColorModeValue(`${getScoreColor(malware_score)}.50`, `${getScoreColor(malware_score)}.900`)} 
-        borderRadius="md" 
-        mb={6}
-      >
-        <Flex 
-          direction={{ base: 'column', md: 'row' }} 
+      <Box p={4} borderRadius="md" mb={6}>
+        <Flex
+          direction={{ base: "column", md: "row" }}
           justify="space-between"
-          align={{ base: 'flex-start', md: 'center' }}
+          align={{ base: "flex-start", md: "center" }}
         >
           <Box mb={{ base: 2, md: 0 }}>
             <Heading size="md" mb={1}>
-              <Badge 
-                colorScheme={severityColors[severity]} 
-                fontSize="0.8em" 
-                p={1} 
+              <Badge
+                colorScheme={severityColors[severity]}
+                fontSize="0.8em"
+                p={1}
                 borderRadius="md"
               >
                 {severity.toUpperCase()} RISK
-              </Badge>
-              {' '}
-              {malware_category !== 'clean' ? malware_category : 'No Threats Detected'}
+              </Badge>{" "}
+              {malware_category !== "clean"
+                ? malware_category
+                : "No Threats Detected"}
             </Heading>
-            
+
             {malware_family && (
-              <Text fontWeight="medium">
-                Malware Family: {malware_family}
-              </Text>
+              <Text fontWeight="medium">Malware Family: {malware_family}</Text>
             )}
           </Box>
-          
-          <Stat textAlign={{ base: 'left', md: 'right' }} minW="150px">
+
+          <Stat textAlign={{ base: "left", md: "right" }} minW="150px">
             <StatLabel>Malware Score</StatLabel>
             <StatNumber color={`${getScoreColor(malware_score)}.500`}>
               {(malware_score * 100).toFixed(1)}%
@@ -265,12 +264,14 @@ const AnalysisReport = ({ analysis, status, taskId }) => {
           </Stat>
         </Flex>
       </Box>
-      
+
       {/* Summary */}
       <Box mb={6}>
-        <Heading size="md" mb={2}>Analysis Summary</Heading>
+        <Heading size="md" mb={2}>
+          Analysis Summary
+        </Heading>
         <Text>{static_analysis_summary}</Text>
-        
+
         {recommendation && (
           <Alert status="info" mt={3} borderRadius="md">
             <AlertIcon />
@@ -281,12 +282,12 @@ const AnalysisReport = ({ analysis, status, taskId }) => {
           </Alert>
         )}
       </Box>
-      
+
       {/* Tabs for different sections */}
-      <Tabs 
-        isFitted 
-        variant="enclosed" 
-        colorScheme="brand" 
+      <Tabs
+        isFitted
+        variant="enclosed"
+        colorScheme="brand"
         onChange={(index) => setActiveTab(index)}
         index={activeTab}
       >
@@ -296,27 +297,31 @@ const AnalysisReport = ({ analysis, status, taskId }) => {
           {exe_details && <Tab>EXE Analysis</Tab>}
           {pdf_details && <Tab>PDF Analysis</Tab>}
         </TabList>
-        
+
         <TabPanels>
           {/* File Info Panel */}
           <TabPanel>
             <SimpleGrid columns={{ base: 1, md: 2 }} spacing={5}>
               <Stat>
                 <StatLabel>File Name</StatLabel>
-                <StatNumber fontSize="lg">{file_info.original_filename}</StatNumber>
+                <StatNumber fontSize="lg">
+                  {file_info.original_filename}
+                </StatNumber>
               </Stat>
-              
+
               <Stat>
                 <StatLabel>File Type</StatLabel>
                 <StatNumber fontSize="lg">{file_info.file_type}</StatNumber>
                 <StatHelpText>{file_info.mime_type}</StatHelpText>
               </Stat>
-              
+
               <Stat>
                 <StatLabel>File Size</StatLabel>
-                <StatNumber fontSize="lg">{formatFileSize(file_info.file_size)}</StatNumber>
+                <StatNumber fontSize="lg">
+                  {formatFileSize(file_info.file_size)}
+                </StatNumber>
               </Stat>
-              
+
               <Stat>
                 <StatLabel>Upload Time</StatLabel>
                 <StatNumber fontSize="lg">
@@ -324,30 +329,38 @@ const AnalysisReport = ({ analysis, status, taskId }) => {
                 </StatNumber>
               </Stat>
             </SimpleGrid>
-            
+
             <Divider my={4} />
-            
-            <Heading size="sm" mb={2}>File Hashes</Heading>
+
+            <Heading size="sm" mb={2}>
+              File Hashes
+            </Heading>
             <TableContainer>
               <Table variant="simple" size="sm">
                 <Tbody>
                   <Tr>
                     <Th>MD5</Th>
-                    <Td><Code>{file_info.md5}</Code></Td>
+                    <Td>
+                      <Code>{file_info.md5}</Code>
+                    </Td>
                   </Tr>
                   <Tr>
                     <Th>SHA1</Th>
-                    <Td><Code>{file_info.sha1}</Code></Td>
+                    <Td>
+                      <Code>{file_info.sha1}</Code>
+                    </Td>
                   </Tr>
                   <Tr>
                     <Th>SHA256</Th>
-                    <Td><Code>{file_info.sha256}</Code></Td>
+                    <Td>
+                      <Code>{file_info.sha256}</Code>
+                    </Td>
                   </Tr>
                 </Tbody>
               </Table>
             </TableContainer>
           </TabPanel>
-          
+
           {/* Indicators Panel */}
           <TabPanel>
             {indicators.length > 0 ? (
@@ -368,7 +381,9 @@ const AnalysisReport = ({ analysis, status, taskId }) => {
                         <Td fontWeight="medium">{indicator.name}</Td>
                         <Td>{indicator.description}</Td>
                         <Td>
-                          <Badge colorScheme={severityColors[indicator.severity]}>
+                          <Badge
+                            colorScheme={severityColors[indicator.severity]}
+                          >
                             {indicator.severity}
                           </Badge>
                         </Td>
@@ -384,7 +399,7 @@ const AnalysisReport = ({ analysis, status, taskId }) => {
               </Alert>
             )}
           </TabPanel>
-          
+
           {/* EXE Analysis Panel */}
           {exe_details && (
             <TabPanel>
@@ -403,50 +418,70 @@ const AnalysisReport = ({ analysis, status, taskId }) => {
                     <SimpleGrid columns={{ base: 1, md: 2 }} spacing={5}>
                       <Stat>
                         <StatLabel>Architecture</StatLabel>
-                        <StatNumber fontSize="lg">{exe_details.architecture || 'Unknown'}</StatNumber>
+                        <StatNumber fontSize="lg">
+                          {exe_details.architecture || "Unknown"}
+                        </StatNumber>
                       </Stat>
-                      
+
                       <Stat>
                         <StatLabel>Subsystem</StatLabel>
-                        <StatNumber fontSize="lg">{exe_details.subsystem || 'Unknown'}</StatNumber>
+                        <StatNumber fontSize="lg">
+                          {exe_details.subsystem || "Unknown"}
+                        </StatNumber>
                       </Stat>
-                      
+
                       <Stat>
                         <StatLabel>Is Packed</StatLabel>
-                        <StatNumber fontSize="lg">{exe_details.is_packed ? 'Yes' : 'No'}</StatNumber>
+                        <StatNumber fontSize="lg">
+                          {exe_details.is_packed ? "Yes" : "No"}
+                        </StatNumber>
                         {exe_details.is_packed && (
-                          <StatHelpText>Packer: {exe_details.packer_type || 'Unknown'}</StatHelpText>
+                          <StatHelpText>
+                            Packer: {exe_details.packer_type || "Unknown"}
+                          </StatHelpText>
                         )}
                       </Stat>
-                      
+
                       <Stat>
                         <StatLabel>Compile Time</StatLabel>
                         <StatNumber fontSize="lg">
-                          {exe_details.compile_time ? new Date(exe_details.compile_time).toLocaleString() : 'Unknown'}
+                          {exe_details.compile_time
+                            ? new Date(
+                                exe_details.compile_time
+                              ).toLocaleString()
+                            : "Unknown"}
                         </StatNumber>
                       </Stat>
-                      
+
                       <Stat>
                         <StatLabel>Entry Point</StatLabel>
-                        <StatNumber fontSize="lg">{exe_details.entry_point || 'Unknown'}</StatNumber>
+                        <StatNumber fontSize="lg">
+                          {exe_details.entry_point || "Unknown"}
+                        </StatNumber>
                       </Stat>
-                      
+
                       <Stat>
                         <StatLabel>Type</StatLabel>
                         <StatNumber fontSize="lg">
-                          {exe_details.is_dll ? 'DLL' : exe_details.is_driver ? 'Driver' : 'Executable'}
+                          {exe_details.is_dll
+                            ? "DLL"
+                            : exe_details.is_driver
+                            ? "Driver"
+                            : "Executable"}
                         </StatNumber>
                       </Stat>
                     </SimpleGrid>
                   </AccordionPanel>
                 </AccordionItem>
-                
+
                 {/* Sections */}
                 <AccordionItem>
                   <h2>
                     <AccordionButton>
                       <Box flex="1" textAlign="left" fontWeight="medium">
-                        Sections ({exe_details.sections ? exe_details.sections.length : 0})
+                        Sections (
+                        {exe_details.sections ? exe_details.sections.length : 0}
+                        )
                       </Box>
                       <AccordionIcon />
                     </AccordionButton>
@@ -468,24 +503,43 @@ const AnalysisReport = ({ analysis, status, taskId }) => {
                             {exe_details.sections.map((section, idx) => (
                               <Tr key={idx}>
                                 <Td fontFamily="mono">{section.name}</Td>
-                                <Td>{section.virtual_size || 'N/A'}</Td>
-                                <Td>{section.raw_size || 'N/A'}</Td>
+                                <Td>{section.virtual_size || "N/A"}</Td>
+                                <Td>{section.raw_size || "N/A"}</Td>
                                 <Td>
                                   {section.entropy ? (
-                                    <Badge 
-                                      colorScheme={section.entropy > 7.0 ? 'red' : section.entropy > 6.0 ? 'yellow' : 'green'}
+                                    <Badge
+                                      colorScheme={
+                                        section.entropy > 7.0
+                                          ? "red"
+                                          : section.entropy > 6.0
+                                          ? "yellow"
+                                          : "green"
+                                      }
                                     >
                                       {section.entropy.toFixed(2)}
                                     </Badge>
-                                  ) : 'N/A'}
+                                  ) : (
+                                    "N/A"
+                                  )}
                                 </Td>
                                 <Td>
-                                  <Stack direction="row" spacing={1} wrap="wrap">
-                                    {section.characteristics && section.characteristics.map((char, i) => (
-                                      <Tag size="sm" key={i} colorScheme="gray" mr={1} mb={1}>
-                                        {char}
-                                      </Tag>
-                                    ))}
+                                  <Stack
+                                    direction="row"
+                                    spacing={1}
+                                    wrap="wrap"
+                                  >
+                                    {section.characteristics &&
+                                      section.characteristics.map((char, i) => (
+                                        <Tag
+                                          size="sm"
+                                          key={i}
+                                          colorScheme="gray"
+                                          mr={1}
+                                          mb={1}
+                                        >
+                                          {char}
+                                        </Tag>
+                                      ))}
                                   </Stack>
                                 </Td>
                               </Tr>
@@ -498,7 +552,7 @@ const AnalysisReport = ({ analysis, status, taskId }) => {
                     )}
                   </AccordionPanel>
                 </AccordionItem>
-                
+
                 {/* Imports and Libraries */}
                 <AccordionItem>
                   <h2>
@@ -510,8 +564,13 @@ const AnalysisReport = ({ analysis, status, taskId }) => {
                     </AccordionButton>
                   </h2>
                   <AccordionPanel pb={4}>
-                    <Heading size="sm" mb={2}>Libraries ({exe_details.libraries ? exe_details.libraries.length : 0})</Heading>
-                    {exe_details.libraries && exe_details.libraries.length > 0 ? (
+                    <Heading size="sm" mb={2}>
+                      Libraries (
+                      {exe_details.libraries ? exe_details.libraries.length : 0}
+                      )
+                    </Heading>
+                    {exe_details.libraries &&
+                    exe_details.libraries.length > 0 ? (
                       <Flex wrap="wrap" mb={4}>
                         {exe_details.libraries.map((lib, idx) => (
                           <Tag size="md" key={idx} m={1} colorScheme="blue">
@@ -522,12 +581,21 @@ const AnalysisReport = ({ analysis, status, taskId }) => {
                     ) : (
                       <Text mb={4}>No imported libraries detected.</Text>
                     )}
-                    
-                    <Heading size="sm" mb={2}>Imports ({exe_details.imports ? exe_details.imports.length : 0})</Heading>
+
+                    <Heading size="sm" mb={2}>
+                      Imports (
+                      {exe_details.imports ? exe_details.imports.length : 0})
+                    </Heading>
                     {exe_details.imports && exe_details.imports.length > 0 ? (
-                      <Box maxH="300px" overflowY="auto" borderWidth="1px" borderRadius="md" p={2}>
+                      <Box
+                        maxH="300px"
+                        overflowY="auto"
+                        borderWidth="1px"
+                        borderRadius="md"
+                        p={2}
+                      >
                         <Code as="pre" overflowX="auto" width="100%">
-                          {exe_details.imports.join('\n')}
+                          {exe_details.imports.join("\n")}
                         </Code>
                       </Box>
                     ) : (
@@ -535,7 +603,7 @@ const AnalysisReport = ({ analysis, status, taskId }) => {
                     )}
                   </AccordionPanel>
                 </AccordionItem>
-                
+
                 {/* Strings of Interest */}
                 <AccordionItem>
                   <h2>
@@ -547,7 +615,8 @@ const AnalysisReport = ({ analysis, status, taskId }) => {
                     </AccordionButton>
                   </h2>
                   <AccordionPanel pb={4}>
-                    {exe_details.strings_of_interest && exe_details.strings_of_interest.length > 0 ? (
+                    {exe_details.strings_of_interest &&
+                    exe_details.strings_of_interest.length > 0 ? (
                       <TableContainer>
                         <Table variant="simple" size="sm">
                           <Thead>
@@ -560,7 +629,9 @@ const AnalysisReport = ({ analysis, status, taskId }) => {
                             {exe_details.strings_of_interest.map((str, idx) => (
                               <Tr key={idx}>
                                 <Td>{str.type}</Td>
-                                <Td><Code>{str.value}</Code></Td>
+                                <Td>
+                                  <Code>{str.value}</Code>
+                                </Td>
                               </Tr>
                             ))}
                           </Tbody>
@@ -571,7 +642,7 @@ const AnalysisReport = ({ analysis, status, taskId }) => {
                     )}
                   </AccordionPanel>
                 </AccordionItem>
-                
+
                 {/* Resources */}
                 <AccordionItem>
                   <h2>
@@ -583,7 +654,8 @@ const AnalysisReport = ({ analysis, status, taskId }) => {
                     </AccordionButton>
                   </h2>
                   <AccordionPanel pb={4}>
-                    {exe_details.resources && exe_details.resources.length > 0 ? (
+                    {exe_details.resources &&
+                    exe_details.resources.length > 0 ? (
                       <TableContainer>
                         <Table variant="simple" size="sm">
                           <Thead>
@@ -614,7 +686,7 @@ const AnalysisReport = ({ analysis, status, taskId }) => {
               </Accordion>
             </TabPanel>
           )}
-          
+
           {/* PDF Analysis Panel */}
           {pdf_details && (
             <TabPanel>
@@ -633,57 +705,96 @@ const AnalysisReport = ({ analysis, status, taskId }) => {
                     <SimpleGrid columns={{ base: 1, md: 2 }} spacing={5}>
                       <Stat>
                         <StatLabel>PDF Version</StatLabel>
-                        <StatNumber fontSize="lg">{pdf_details.version || 'Unknown'}</StatNumber>
+                        <StatNumber fontSize="lg">
+                          {pdf_details.version || "Unknown"}
+                        </StatNumber>
                       </Stat>
-                      
+
                       <Stat>
                         <StatLabel>Page Count</StatLabel>
-                        <StatNumber fontSize="lg">{pdf_details.page_count || 'Unknown'}</StatNumber>
+                        <StatNumber fontSize="lg">
+                          {pdf_details.page_count || "Unknown"}
+                        </StatNumber>
                       </Stat>
-                      
+
                       <Stat>
                         <StatLabel>Contains JavaScript</StatLabel>
-                        <StatNumber fontSize="lg" color={pdf_details.has_javascript ? 'red.500' : 'green.500'}>
-                          {pdf_details.has_javascript ? 'Yes' : 'No'}
+                        <StatNumber
+                          fontSize="lg"
+                          color={
+                            pdf_details.has_javascript ? "red.500" : "green.500"
+                          }
+                        >
+                          {pdf_details.has_javascript ? "Yes" : "No"}
                         </StatNumber>
                       </Stat>
-                      
+
                       <Stat>
                         <StatLabel>Contains Forms</StatLabel>
-                        <StatNumber fontSize="lg">{pdf_details.has_forms ? 'Yes' : 'No'}</StatNumber>
+                        <StatNumber fontSize="lg">
+                          {pdf_details.has_forms ? "Yes" : "No"}
+                        </StatNumber>
                       </Stat>
-                      
+
                       <Stat>
                         <StatLabel>Embedded Files</StatLabel>
-                        <StatNumber fontSize="lg" color={pdf_details.has_embedded_files ? 'red.500' : 'green.500'}>
-                          {pdf_details.has_embedded_files ? 'Yes' : 'No'}
+                        <StatNumber
+                          fontSize="lg"
+                          color={
+                            pdf_details.has_embedded_files
+                              ? "red.500"
+                              : "green.500"
+                          }
+                        >
+                          {pdf_details.has_embedded_files ? "Yes" : "No"}
                         </StatNumber>
                       </Stat>
-                      
+
                       <Stat>
                         <StatLabel>Auto Actions</StatLabel>
-                        <StatNumber fontSize="lg" color={pdf_details.has_auto_action ? 'red.500' : 'green.500'}>
-                          {pdf_details.has_auto_action ? 'Yes' : 'No'}
+                        <StatNumber
+                          fontSize="lg"
+                          color={
+                            pdf_details.has_auto_action
+                              ? "red.500"
+                              : "green.500"
+                          }
+                        >
+                          {pdf_details.has_auto_action ? "Yes" : "No"}
                         </StatNumber>
                       </Stat>
-                      
+
                       <Stat>
                         <StatLabel>Encryption</StatLabel>
-                        <StatNumber fontSize="lg" color={pdf_details.has_encryption ? 'yellow.500' : 'green.500'}>
-                          {pdf_details.has_encryption ? 'Yes' : 'No'}
+                        <StatNumber
+                          fontSize="lg"
+                          color={
+                            pdf_details.has_encryption
+                              ? "yellow.500"
+                              : "green.500"
+                          }
+                        >
+                          {pdf_details.has_encryption ? "Yes" : "No"}
                         </StatNumber>
                       </Stat>
-                      
+
                       <Stat>
                         <StatLabel>Obfuscation</StatLabel>
-                        <StatNumber fontSize="lg" color={pdf_details.has_obfuscation ? 'red.500' : 'green.500'}>
-                          {pdf_details.has_obfuscation ? 'Yes' : 'No'}
+                        <StatNumber
+                          fontSize="lg"
+                          color={
+                            pdf_details.has_obfuscation
+                              ? "red.500"
+                              : "green.500"
+                          }
+                        >
+                          {pdf_details.has_obfuscation ? "Yes" : "No"}
                         </StatNumber>
                       </Stat>
                     </SimpleGrid>
                   </AccordionPanel>
                 </AccordionItem>
-                
+
                 {/* JavaScript */}
                 {pdf_details.has_javascript && (
                   <AccordionItem>
@@ -696,19 +807,28 @@ const AnalysisReport = ({ analysis, status, taskId }) => {
                       </AccordionButton>
                     </h2>
                     <AccordionPanel pb={4}>
-                      {pdf_details.javascript_code && pdf_details.javascript_code.length > 0 ? (
-                        <Box maxH="500px" overflowY="auto" borderWidth="1px" borderRadius="md" p={2}>
+                      {pdf_details.javascript_code &&
+                      pdf_details.javascript_code.length > 0 ? (
+                        <Box
+                          maxH="500px"
+                          overflowY="auto"
+                          borderWidth="1px"
+                          borderRadius="md"
+                          p={2}
+                        >
                           <Code as="pre" overflowX="auto" width="100%">
-                            {pdf_details.javascript_code.join('\n\n')}
+                            {pdf_details.javascript_code.join("\n\n")}
                           </Code>
                         </Box>
                       ) : (
-                        <Text>JavaScript detected but code could not be extracted.</Text>
+                        <Text>
+                          JavaScript detected but code could not be extracted.
+                        </Text>
                       )}
                     </AccordionPanel>
                   </AccordionItem>
                 )}
-                
+
                 {/* Embedded Files */}
                 {pdf_details.has_embedded_files && (
                   <AccordionItem>
@@ -721,7 +841,8 @@ const AnalysisReport = ({ analysis, status, taskId }) => {
                       </AccordionButton>
                     </h2>
                     <AccordionPanel pb={4}>
-                      {pdf_details.embedded_files && pdf_details.embedded_files.length > 0 ? (
+                      {pdf_details.embedded_files &&
+                      pdf_details.embedded_files.length > 0 ? (
                         <TableContainer>
                           <Table variant="simple" size="sm">
                             <Thead>
@@ -741,12 +862,15 @@ const AnalysisReport = ({ analysis, status, taskId }) => {
                           </Table>
                         </TableContainer>
                       ) : (
-                        <Text>Embedded files detected but details could not be extracted.</Text>
+                        <Text>
+                          Embedded files detected but details could not be
+                          extracted.
+                        </Text>
                       )}
                     </AccordionPanel>
                   </AccordionItem>
                 )}
-                
+
                 {/* Auto Actions */}
                 {pdf_details.has_auto_action && (
                   <AccordionItem>
@@ -759,7 +883,8 @@ const AnalysisReport = ({ analysis, status, taskId }) => {
                       </AccordionButton>
                     </h2>
                     <AccordionPanel pb={4}>
-                      {pdf_details.auto_actions && pdf_details.auto_actions.length > 0 ? (
+                      {pdf_details.auto_actions &&
+                      pdf_details.auto_actions.length > 0 ? (
                         <TableContainer>
                           <Table variant="simple" size="sm">
                             <Thead>
@@ -779,12 +904,15 @@ const AnalysisReport = ({ analysis, status, taskId }) => {
                           </Table>
                         </TableContainer>
                       ) : (
-                        <Text>Auto actions detected but details could not be extracted.</Text>
+                        <Text>
+                          Auto actions detected but details could not be
+                          extracted.
+                        </Text>
                       )}
                     </AccordionPanel>
                   </AccordionItem>
                 )}
-                
+
                 {/* URLs */}
                 <AccordionItem>
                   <h2>
@@ -797,10 +925,21 @@ const AnalysisReport = ({ analysis, status, taskId }) => {
                   </h2>
                   <AccordionPanel pb={4}>
                     {pdf_details.urls && pdf_details.urls.length > 0 ? (
-                      <Box maxH="300px" overflowY="auto" borderWidth="1px" borderRadius="md" p={2}>
+                      <Box
+                        maxH="300px"
+                        overflowY="auto"
+                        borderWidth="1px"
+                        borderRadius="md"
+                        p={2}
+                      >
                         <Stack spacing={2}>
                           {pdf_details.urls.map((url, idx) => (
-                            <Box key={idx} p={2} borderWidth="1px" borderRadius="md">
+                            <Box
+                              key={idx}
+                              p={2}
+                              borderWidth="1px"
+                              borderRadius="md"
+                            >
                               <Code>{url}</Code>
                             </Box>
                           ))}
@@ -811,7 +950,7 @@ const AnalysisReport = ({ analysis, status, taskId }) => {
                     )}
                   </AccordionPanel>
                 </AccordionItem>
-                
+
                 {/* Suspicious Objects */}
                 {pdf_details.has_suspicious_objects && (
                   <AccordionItem>
@@ -824,7 +963,8 @@ const AnalysisReport = ({ analysis, status, taskId }) => {
                       </AccordionButton>
                     </h2>
                     <AccordionPanel pb={4}>
-                      {pdf_details.suspicious_objects && pdf_details.suspicious_objects.length > 0 ? (
+                      {pdf_details.suspicious_objects &&
+                      pdf_details.suspicious_objects.length > 0 ? (
                         <TableContainer>
                           <Table variant="simple" size="sm">
                             <Thead>
@@ -835,18 +975,25 @@ const AnalysisReport = ({ analysis, status, taskId }) => {
                               </Tr>
                             </Thead>
                             <Tbody>
-                              {pdf_details.suspicious_objects.map((obj, idx) => (
-                                <Tr key={idx}>
-                                  <Td>{obj.type}</Td>
-                                  <Td><Code>{obj.pattern}</Code></Td>
-                                  <Td>{obj.object_id}</Td>
-                                </Tr>
-                              ))}
+                              {pdf_details.suspicious_objects.map(
+                                (obj, idx) => (
+                                  <Tr key={idx}>
+                                    <Td>{obj.type}</Td>
+                                    <Td>
+                                      <Code>{obj.pattern}</Code>
+                                    </Td>
+                                    <Td>{obj.object_id}</Td>
+                                  </Tr>
+                                )
+                              )}
                             </Tbody>
                           </Table>
                         </TableContainer>
                       ) : (
-                        <Text>Suspicious objects detected but details could not be extracted.</Text>
+                        <Text>
+                          Suspicious objects detected but details could not be
+                          extracted.
+                        </Text>
                       )}
                     </AccordionPanel>
                   </AccordionItem>

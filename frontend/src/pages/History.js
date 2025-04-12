@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+
 import {
   Box,
   Container,
@@ -32,78 +33,77 @@ import {
   PaginationNext,
   PaginationPageGroup,
   PaginationPage,
-  usePagination,
-} from '@chakra-ui/react';
-import { ViewIcon, DownloadIcon, SearchIcon } from '@chakra-ui/icons';
-import { getAnalysisHistory } from '../utils/api';
+} from "@chakra-ui/react";
+import { ViewIcon, DownloadIcon, SearchIcon } from "@chakra-ui/icons";
+import { getAnalysisHistory } from "../utils/api";
 
 // Mock data for history (in a real app, this would come from the API)
 const mockHistoryData = [
   {
-    id: '1234abcd',
-    file_name: 'sample1.exe',
-    file_type: 'exe',
-    upload_time: '2023-03-01T14:30:45Z',
-    status: 'completed',
+    id: "1234abcd",
+    file_name: "sample1.exe",
+    file_type: "exe",
+    upload_time: "2023-03-01T14:30:45Z",
+    status: "completed",
     malware_score: 0.89,
-    severity: 'high',
-    malware_category: 'trojan',
+    severity: "high",
+    malware_category: "trojan",
   },
   {
-    id: '5678efgh',
-    file_name: 'document.pdf',
-    file_type: 'pdf',
-    upload_time: '2023-03-01T10:15:22Z',
-    status: 'completed',
+    id: "5678efgh",
+    file_name: "document.pdf",
+    file_type: "pdf",
+    upload_time: "2023-03-01T10:15:22Z",
+    status: "completed",
     malware_score: 0.05,
-    severity: 'clean',
-    malware_category: 'clean',
+    severity: "clean",
+    malware_category: "clean",
   },
   {
-    id: '9012ijkl',
-    file_name: 'suspicious.exe',
-    file_type: 'exe',
-    upload_time: '2023-02-28T18:45:30Z',
-    status: 'completed',
+    id: "9012ijkl",
+    file_name: "suspicious.exe",
+    file_type: "exe",
+    upload_time: "2023-02-28T18:45:30Z",
+    status: "completed",
     malware_score: 0.45,
-    severity: 'medium',
-    malware_category: 'adware',
+    severity: "medium",
+    malware_category: "adware",
   },
   {
-    id: '3456mnop',
-    file_name: 'test_file.exe',
-    file_type: 'exe',
-    upload_time: '2023-02-28T09:20:15Z',
-    status: 'failed',
+    id: "3456mnop",
+    file_name: "test_file.exe",
+    file_type: "exe",
+    upload_time: "2023-02-28T09:20:15Z",
+    status: "failed",
     malware_score: null,
     severity: null,
     malware_category: null,
   },
   {
-    id: '7890qrst',
-    file_name: 'report.pdf',
-    file_type: 'pdf',
-    upload_time: '2023-02-27T16:10:05Z',
-    status: 'completed',
+    id: "7890qrst",
+    file_name: "report.pdf",
+    file_type: "pdf",
+    upload_time: "2023-02-27T16:10:05Z",
+    status: "completed",
     malware_score: 0.75,
-    severity: 'high',
-    malware_category: 'backdoor',
+    severity: "high",
+    malware_category: "backdoor",
   },
 ];
 
 const severityColors = {
-  high: 'red',
-  medium: 'orange',
-  low: 'blue',
-  clean: 'green',
-  unknown: 'gray',
+  high: "red",
+  medium: "orange",
+  low: "blue",
+  clean: "green",
+  unknown: "gray",
 };
 
 const statusColors = {
-  completed: 'green',
-  processing: 'blue',
-  queued: 'yellow',
-  failed: 'red',
+  completed: "green",
+  processing: "blue",
+  queued: "yellow",
+  failed: "red",
 };
 
 const History = () => {
@@ -111,14 +111,15 @@ const History = () => {
   const [analyses, setAnalyses] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterType, setFilterType] = useState('all');
-  const [filterStatus, setFilterStatus] = useState('all');
-  
-  const bg = useColorModeValue('white', 'gray.800');
-  
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterType, setFilterType] = useState("all");
+  const [filterStatus, setFilterStatus] = useState("all");
+
+  const bg = useColorModeValue("white", "gray.800");
+
   // Pagination settings
-  const { currentPage, setCurrentPage, pagesCount, pages } = usePagination({
+  const { currentPage, setCurrentPage, pagesCount, pages } = {
+    //removed usePagination
     total: analyses.length,
     limits: {
       outer: 2,
@@ -128,8 +129,8 @@ const History = () => {
       pageSize: 10,
       currentPage: 1,
     },
-  });
-  
+  };
+
   // Fetch history data
   useEffect(() => {
     const fetchHistory = async () => {
@@ -138,52 +139,56 @@ const History = () => {
         // In a real app, this would be an API call
         // const response = await getAnalysisHistory();
         // setAnalyses(response.items);
-        
+
         // Using mock data for this example
         setTimeout(() => {
           setAnalyses(mockHistoryData);
           setIsLoading(false);
         }, 1000);
       } catch (error) {
-        console.error('Error fetching history:', error);
-        setError('Failed to load analysis history. Please try again.');
+        console.error("Error fetching history:", error);
+        setError("Failed to load analysis history. Please try again.");
         setIsLoading(false);
       }
     };
-    
+
     fetchHistory();
   }, []);
-  
+
   // Handle view analysis
   const handleView = (id) => {
     navigate(`/analysis/${id}`);
   };
-  
+
   // Handle download report
-  const handleDownload = (id, format = 'pdf') => {
-    window.open(`/api/reports/${id}?format=${format}`, '_blank');
+  const handleDownload = (id, format = "pdf") => {
+    window.open(`/api/reports/${id}?format=${format}`, "_blank");
   };
-  
+
   // Filter analyses based on search and filters
   const filteredAnalyses = analyses.filter((analysis) => {
-    const matchesSearch = analysis.file_name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesType = filterType === 'all' || analysis.file_type === filterType;
-    const matchesStatus = filterStatus === 'all' || analysis.status === filterStatus;
-    
+    const matchesSearch = analysis.file_name
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
+    const matchesType =
+      filterType === "all" || analysis.file_type === filterType;
+    const matchesStatus =
+      filterStatus === "all" || analysis.status === filterStatus;
+
     return matchesSearch && matchesType && matchesStatus;
   });
-  
+
   // Paginate filtered analyses
   const startIdx = (currentPage - 1) * 10;
   const endIdx = startIdx + 10;
   const paginatedAnalyses = filteredAnalyses.slice(startIdx, endIdx);
-  
+
   // Format date
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleString();
   };
-  
+
   if (isLoading) {
     return (
       <Container maxW="container.xl" py={8}>
@@ -201,7 +206,7 @@ const History = () => {
       </Container>
     );
   }
-  
+
   if (error) {
     return (
       <Container maxW="container.xl" py={8}>
@@ -212,18 +217,16 @@ const History = () => {
       </Container>
     );
   }
-  
+
   return (
     <Container maxW="container.xl" py={8}>
       <Box mb={6}>
         <Heading as="h1" size="xl" mb={2}>
           Analysis History
         </Heading>
-        <Text color="gray.500">
-          View and manage your past file analyses
-        </Text>
+        <Text color="gray.500">View and manage your past file analyses</Text>
       </Box>
-      
+
       {/* Filters and search */}
       <Box mb={6}>
         <HStack spacing={4} wrap="wrap">
@@ -237,7 +240,7 @@ const History = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </InputGroup>
-          
+
           <Select
             maxW="200px"
             value={filterType}
@@ -247,7 +250,7 @@ const History = () => {
             <option value="exe">EXE Files</option>
             <option value="pdf">PDF Files</option>
           </Select>
-          
+
           <Select
             maxW="200px"
             value={filterStatus}
@@ -261,7 +264,7 @@ const History = () => {
           </Select>
         </HStack>
       </Box>
-      
+
       {/* Analysis history table */}
       <Box
         p={5}
@@ -305,13 +308,13 @@ const History = () => {
                           {analysis.severity}
                         </Badge>
                       ) : (
-                        '-'
+                        "-"
                       )}
                     </Td>
                     <Td>
                       {analysis.malware_score !== null
                         ? `${(analysis.malware_score * 100).toFixed(1)}%`
-                        : '-'}
+                        : "-"}
                     </Td>
                     <Td>
                       <ButtonGroup size="sm" isAttached variant="outline">
@@ -321,7 +324,7 @@ const History = () => {
                           onClick={() => handleView(analysis.id)}
                           colorScheme="brand"
                         />
-                        {analysis.status === 'completed' && (
+                        {analysis.status === "completed" && (
                           <IconButton
                             aria-label="Download report"
                             icon={<DownloadIcon />}
@@ -338,11 +341,13 @@ const History = () => {
           </TableContainer>
         ) : (
           <Box textAlign="center" py={10}>
-            <Text fontSize="lg">No analysis history found matching your filters.</Text>
+            <Text fontSize="lg">
+              No analysis history found matching your filters.
+            </Text>
           </Box>
         )}
       </Box>
-      
+
       {/* Pagination */}
       {filteredAnalyses.length > 0 && (
         <Flex justify="center" mt={4}>
@@ -355,7 +360,7 @@ const History = () => {
             >
               Previous
             </Button>
-            
+
             {pages.map((page) => (
               <Button
                 key={page}
@@ -366,7 +371,7 @@ const History = () => {
                 {page}
               </Button>
             ))}
-            
+
             <Button
               onClick={() => setCurrentPage(currentPage + 1)}
               isDisabled={currentPage === pagesCount}

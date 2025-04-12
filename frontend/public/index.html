@@ -1,31 +1,19 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { ChakraProvider, CSSReset, extendTheme } from '@chakra-ui/react';
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#000000" />
+    <meta name="description" content="AI/ML Malware Analysis Web App" />
 
-// Import components
-import Navigation from './components/Navigation';
-import Home from './pages/Home';
-import Analysis from './pages/Analysis';
-import History from './pages/History';
+    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
 
-// Define theme
-const theme = extendTheme({
-  colors: {
-    brand: {
-      50: '#e6fffa',
-      100: '#b2f5ea',
-      200: '#81e6d9',
-      300: '#4fd1c5',
-      400: '#38b2ac',
-      500: '#319795',
-      600: '#2c7a7b',
-      700: '#285e61',
-      800: '#234e52',
-      900: '#1d4044',
-    },
-    severity: {
-      high: '#E53E3E',
-      medium: '#DD6B20',
-      low: '#3182CE',
-      clean: '#38A169',
-      unknown: '#718
+    <title>Malware Analysis Tool</title>
+  </head>
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root"></div>
+  </body>
+</html>
