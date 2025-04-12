@@ -19,9 +19,8 @@ class Settings(BaseSettings):
     
     # CORS settings
     CORS_ORIGINS: List[str] = [
-        "http://localhost:3000",  # Frontend in development
-        "http://localhost:8080",  # Frontend in Docker during development
-        "https://your-production-domain.com",  # Production domain
+        "*",  # Frontend in development
+         # Production domain
     ]
     
     # File upload settings
