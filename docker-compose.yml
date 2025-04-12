@@ -1,0 +1,72 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: malware-analyzer-backend
+    restart: unless-stopped
+    volumes:
+      - ./backend:/app
+      - data-volume:/data
+    environment:
+      - UPLOAD_DIR=/data/uploads
+      - REPORTS_DIR=/data/reports
+      - MODEL_PATH=/data/trained_models/trained.pkl
+      - SECRET_KEY=change-this-in-production-to-a-secure-random-key
+      - CORS_ORIGINS=http://localhost,http://localhost:3000,http://frontend
+    ports:
+      - "8000:8000"
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: malware-analyzer-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+    networks:
+      - app-network
+    environment:
+      - REACT_APP_API_URL=/api
+
+  # Optional database (if needed in the future)
+  # db:
+  #   image: postgres:14-alpine
+  #   container_name: malware-analyzer-db
+  #   restart: unless-stopped
+  #   environment:
+  #     - POSTGRES_USER=postgres
+  #     - POSTGRES_PASSWORD=changeThisToSecurePassword
+  #     - POSTGRES_DB=malware_analyzer
+  #   volumes:
+  #     - db-data:/var/lib/postgresql/data
+  #   networks:
+  #     - app-network
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "pg_isready -U postgres"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+
+volumes:
+  data-volume:
+    driver: local
+  # db-data:
+  #   driver: local
+
+networks:
+  app-network:
+    driver: bridge
