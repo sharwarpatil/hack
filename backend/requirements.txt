@@ -38,3 +38,7 @@ python-dotenv>=1.0.1
 # Optional: alternative PDF analysis libraries
 # pikepdf>=8.11.2
 # pdfminer.six>=20221105
+
+pydantic[email]
+
+jwt

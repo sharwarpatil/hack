@@ -1,5 +1,5 @@
-import React from 'react';
-import { Link as RouterLink } from 'react-router-dom';
+import React from "react";
+import { Link as RouterLink } from "react-router-dom";
 import {
   Box,
   Flex,
@@ -11,19 +11,19 @@ import {
   useDisclosure,
   IconButton,
   HStack,
-  Collapse
-} from '@chakra-ui/react';
-import { HamburgerIcon, CloseIcon, ShieldIcon } from '@chakra-ui/icons';
+  Collapse,
+} from "@chakra-ui/react";
+import { HamburgerIcon, CloseIcon, ShieldIcon } from "@chakra-ui/icons";
 
 const NavLink = ({ children, to }) => (
   <Link
     as={RouterLink}
     px={2}
     py={1}
-    rounded={'md'}
+    rounded={"md"}
     _hover={{
-      textDecoration: 'none',
-      bg: useColorModeValue('gray.200', 'gray.700'),
+      textDecoration: "none",
+      bg: useColorModeValue("gray.200", "gray.700"),
     }}
     to={to}
   >
@@ -33,41 +33,41 @@ const NavLink = ({ children, to }) => (
 
 const Navigation = () => {
   const { isOpen, onToggle } = useDisclosure();
-  const bgColor = useColorModeValue('white', 'gray.800');
-  const borderColor = useColorModeValue('gray.200', 'gray.700');
+  const bgColor = useColorModeValue("white", "gray.800");
+  const borderColor = useColorModeValue("gray.200", "gray.700");
 
   return (
     <Box>
       <Flex
         bg={bgColor}
-        color={useColorModeValue('gray.600', 'white')}
-        minH={'60px'}
+        color={useColorModeValue("gray.600", "white")}
+        minH={"60px"}
         py={{ base: 2 }}
         px={{ base: 4 }}
         borderBottom={1}
-        borderStyle={'solid'}
+        borderStyle={"solid"}
         borderColor={borderColor}
-        align={'center'}
+        align={"center"}
       >
         <Flex
-          flex={{ base: 1, md: 'auto' }}
+          flex={{ base: 1, md: "auto" }}
           ml={{ base: -2 }}
-          display={{ base: 'flex', md: 'none' }}
+          display={{ base: "flex", md: "none" }}
         >
           <IconButton
             onClick={onToggle}
             icon={
               isOpen ? <CloseIcon w={3} h={3} /> : <HamburgerIcon w={5} h={5} />
             }
-            variant={'ghost'}
-            aria-label={'Toggle Navigation'}
+            variant={"ghost"}
+            aria-label={"Toggle Navigation"}
           />
         </Flex>
-        <Flex flex={{ base: 1 }} justify={{ base: 'center', md: 'start' }}>
-          <Link as={RouterLink} to={'/'} textDecoration="none">
+        <Flex flex={{ base: 1 }} justify={{ base: "center", md: "start" }}>
+          <Link as={RouterLink} to={"/"} textDecoration="none">
             <Text
-              fontFamily={'heading'}
-              color={useColorModeValue('gray.800', 'white')}
+              fontFamily={"heading"}
+              color={useColorModeValue("gray.800", "white")}
               fontWeight="bold"
               display="flex"
               alignItems="center"
@@ -90,47 +90,34 @@ const Navigation = () => {
             </Text>
           </Link>
 
-          <Flex display={{ base: 'none', md: 'flex' }} ml={10}>
+          <Flex display={{ base: "none", md: "flex" }} ml={10}>
             <HStack spacing={4}>
-              <NavLink to={'/'}>Home</NavLink>
-              <NavLink to={'/history'}>Analysis History</NavLink>
+              <NavLink to={"/"}>Home</NavLink>
+              <NavLink to={"/history"}>Analysis History</NavLink>
             </HStack>
           </Flex>
         </Flex>
 
         <Stack
           flex={{ base: 1, md: 0 }}
-          justify={'flex-end'}
-          direction={'row'}
+          justify={"flex-end"}
+          direction={"row"}
           spacing={6}
-        >
-          <Button
-            as={'a'}
-            fontSize={'sm'}
-            fontWeight={400}
-            variant={'solid'}
-            href={'https://github.com/yourusername/static-malware-analyzer'}
-            target="_blank"
-            rel="noopener noreferrer"
-            colorScheme="brand"
-          >
-            GitHub
-          </Button>
-        </Stack>
+        >   </Stack>
       </Flex>
 
       <Collapse in={isOpen} animateOpacity>
         <Stack
-          bg={useColorModeValue('white', 'gray.800')}
+          bg={useColorModeValue("white", "gray.800")}
           p={4}
-          display={{ md: 'none' }}
+          display={{ md: "none" }}
           borderBottom={1}
-          borderStyle={'solid'}
+          borderStyle={"solid"}
           borderColor={borderColor}
         >
           <Stack spacing={4}>
-            <NavLink to={'/'}>Home</NavLink>
-            <NavLink to={'/history'}>Analysis History</NavLink>
+            <NavLink to={"/"}>Home</NavLink>
+            <NavLink to={"/history"}>Analysis History</NavLink>
           </Stack>
         </Stack>
       </Collapse>

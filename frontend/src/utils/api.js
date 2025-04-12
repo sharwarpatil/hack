@@ -56,6 +56,19 @@ api.interceptors.response.use(
 );
 
 // Upload file to the server
+// export const uploadFile = async (file, analysisType = "full") => {
+//   const formData = new FormData();
+//   formData.append("file", file);
+//   formData.append("analysis_type", analysisType);
+
+//   const response = await api.post("/files/upload", formData, {
+//     headers: {
+//       "Content-Type": "multipart/form-data",
+//     },
+//   });
+
+//   return response.data;
+// };
 export const uploadFile = async (file, analysisType = "full") => {
   const formData = new FormData();
   formData.append("file", file);
@@ -69,7 +82,6 @@ export const uploadFile = async (file, analysisType = "full") => {
 
   return response.data;
 };
-
 // Check analysis status
 export const getAnalysisStatus = async (taskId) => {
   const response = await api.get(`/analysis/${taskId}/status`);

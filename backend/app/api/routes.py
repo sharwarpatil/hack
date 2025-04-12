@@ -16,7 +16,6 @@ from app.core.security import (
     create_access_token, verify_token, validate_file_type, 
     save_upload_file, compute_file_hash, rate_limit_check
 )
-from app.api.dependencies import get_current_user
 from app.services.analyzer import analyze_file_task, get_analysis_status
 from app.services.report_generator import generate_report
 
@@ -53,7 +52,6 @@ async def upload_file(
     background_tasks: BackgroundTasks,
     file: UploadFile = File(...),
     analysis_type: str = Form("full"),
-    current_user: User = Depends(get_current_user)
 ):
     # Check rate limit
     client_ip = request.client.host
@@ -103,7 +101,6 @@ async def upload_file(
             "sha1": file_hashes["sha1"],
             "sha256": file_hashes["sha256"],
             "mime_type": file_mime_type,
-            "uploader": current_user.username
         }
         
         # In a real application, save file_info to database
@@ -143,7 +140,7 @@ async def upload_file(
 @router.get("/analysis/{task_id}/status", response_model=AnalysisStatusResponse)
 async def check_analysis_status(
     task_id: str,
-    current_user: User = Depends(get_current_user)
+    request: Request,  # Add this parameter
 ):
     """
     Check the status of an analysis task
@@ -155,13 +152,17 @@ async def check_analysis_status(
             detail=f"Analysis task with ID {task_id} not found"
         )
     
+    # If result_url is a relative URL, convert it to absolute
+    if status_data.get("result_url") and status_data["result_url"].startswith("/"):
+        base_url = str(request.base_url).rstrip("/")
+        status_data["result_url"] = f"{base_url}{status_data['result_url']}"
+    
     return status_data
 
 
 @router.get("/analysis/{task_id}/result", response_model=AnalysisResult)
 async def get_analysis_result(
     task_id: str,
-    current_user: User = Depends(get_current_user)
 ):
     """
     Get the results of a completed analysis
@@ -201,7 +202,6 @@ async def get_analysis_result(
 async def get_report(
     task_id: str,
     format: str = "pdf",
-    current_user: User = Depends(get_current_user)
 ):
     """
     Get the generated report file for an analysis
@@ -241,7 +241,6 @@ async def get_report(
 async def request_analysis(
     analysis_request: AnalysisRequest,
     background_tasks: BackgroundTasks,
-    current_user: User = Depends(get_current_user)
 ):
     """
     Request analysis of a previously uploaded file
