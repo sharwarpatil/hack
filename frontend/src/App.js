@@ -5,7 +5,6 @@ import { ChakraProvider, CSSReset, extendTheme } from "@chakra-ui/react";
 import Navigation from "./components/Navigation";
 import Home from "./pages/Home";
 import Analysis from "./pages/Analysis";
-import History from "./pages/History";
 
 // Define theme
 const theme = extendTheme({
@@ -48,7 +47,6 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/analysis/:taskId" element={<Analysis />} />
-        <Route path="/history" element={<History />} />
       </Routes>
     </ChakraProvider>
   );

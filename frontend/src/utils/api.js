@@ -29,6 +29,33 @@ api.interceptors.request.use(
   }
 );
 
+export const requestDynamicAnalysis = async (fileId) => {
+  const formData = new FormData();
+  formData.append("file_id", fileId);
+
+  const response = await api.post("/analysis/dynamic", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+
+  return response.data;
+};
+
+api.interceptors.request.use(
+  async (config) => {
+    const token = localStorage.getItem("auth_token");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    console.error("Request error interceptor:", error);
+    return Promise.reject(error);
+  }
+);
+
 // Response interceptor for API calls
 api.interceptors.response.use(
   (response) => {
@@ -36,6 +63,7 @@ api.interceptors.response.use(
   },
   async (error) => {
     const originalRequest = error.config;
+    console.error("API Error:", error.message, originalRequest.url);
 
     // Handle 401 Unauthorized error
     if (
@@ -44,11 +72,7 @@ api.interceptors.response.use(
       !originalRequest._retry
     ) {
       originalRequest._retry = true;
-
-      // Handle token refresh or redirect to login
-      // For this example, we'll just redirect to homepage
-      window.location.href = "/";
-      return Promise.reject(error);
+      // Handle token refresh logic here if needed
     }
 
     return Promise.reject(error);
@@ -84,22 +108,34 @@ export const uploadFile = async (file, analysisType = "full") => {
 };
 // Check analysis status
 export const getAnalysisStatus = async (taskId) => {
-  const response = await api.get(`/analysis/${taskId}/status`);
-  return response.data;
+  try {
+    const response = await api.get(`/analysis/${taskId}/status`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching status for task ${taskId}:`, error.message);
+    // If we have a meaningful server response, return it
+    if (error.response && error.response.data) {
+      console.error("Server error details:", error.response.data);
+    }
+    // Rethrow the error so the component can handle it
+    throw error;
+  }
 };
 
-// Get analysis result
+// Get analysis result with error handling
 export const getAnalysisResult = async (taskId) => {
-  const response = await api.get(`/analysis/${taskId}/result`);
-  return response.data;
-};
-
-// Get historical analysis list
-export const getAnalysisHistory = async (page = 1, limit = 10) => {
-  const response = await api.get("/analysis/history", {
-    params: { page, limit },
-  });
-  return response.data;
+  try {
+    const response = await api.get(`/analysis/${taskId}/result`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching results for task ${taskId}:`, error.message);
+    // If we have a meaningful server response, return it
+    if (error.response && error.response.data) {
+      console.error("Server error details:", error.response.data);
+    }
+    // Rethrow the error so the component can handle it
+    throw error;
+  }
 };
 
 // Get health status

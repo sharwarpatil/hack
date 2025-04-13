@@ -93,7 +93,6 @@ const Navigation = () => {
           <Flex display={{ base: "none", md: "flex" }} ml={10}>
             <HStack spacing={4}>
               <NavLink to={"/"}>Home</NavLink>
-              <NavLink to={"/history"}>Analysis History</NavLink>
             </HStack>
           </Flex>
         </Flex>
@@ -103,7 +102,9 @@ const Navigation = () => {
           justify={"flex-end"}
           direction={"row"}
           spacing={6}
-        >   </Stack>
+        >
+          {" "}
+        </Stack>
       </Flex>
 
       <Collapse in={isOpen} animateOpacity>
@@ -117,7 +118,6 @@ const Navigation = () => {
         >
           <Stack spacing={4}>
             <NavLink to={"/"}>Home</NavLink>
-            <NavLink to={"/history"}>Analysis History</NavLink>
           </Stack>
         </Stack>
       </Collapse>

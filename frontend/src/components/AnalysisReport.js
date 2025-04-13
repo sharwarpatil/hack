@@ -40,7 +40,10 @@ import {
   TabPanels,
   Tab,
   TabPanel,
+  useToast,
 } from "@chakra-ui/react";
+
+import { useNavigate } from "react-router-dom";
 import {
   DownloadIcon,
   WarningTwoIcon,
@@ -48,6 +51,8 @@ import {
   InfoIcon,
   TimeIcon,
 } from "@chakra-ui/icons";
+import { FaPlay } from "react-icons/fa";
+import { requestDynamicAnalysis } from "../utils/api";
 
 const severityColors = {
   high: "red",
@@ -92,9 +97,14 @@ const StatusBadge = ({ status }) => {
 };
 
 const AnalysisReport = ({ analysis, status, taskId }) => {
+  const navigate = useNavigate();
+  const toast = useToast();
   const [activeTab, setActiveTab] = useState(0);
   const bg = useColorModeValue("white", "gray.800");
   const borderColor = useColorModeValue("gray.200", "gray.700");
+  const [isDynamicAnalysisRequested, setIsDynamicAnalysisRequested] =
+    useState(false);
+  const [dynamicAnalysisTaskId, setDynamicAnalysisTaskId] = useState(null);
 
   if (!analysis && status !== "completed") {
     // Show loading/status screen
@@ -157,7 +167,41 @@ const AnalysisReport = ({ analysis, status, taskId }) => {
     static_analysis_summary,
     malware_family,
     recommendation,
+    dynamic_analysis = null,
   } = analysis;
+
+  // Get file type from the analysis data
+  const file_type = file_info?.file_type || "";
+
+  const handleRequestDynamicAnalysis = async () => {
+    try {
+      setIsDynamicAnalysisRequested(true);
+      const response = await requestDynamicAnalysis(file_info.file_id);
+      setDynamicAnalysisTaskId(response.task_id);
+
+      // Redirect to the analysis page with the new task ID
+      navigate(`/analysis/${response.task_id}`);
+
+      toast({
+        title: "Dynamic Analysis Requested",
+        description:
+          "The file is being analyzed. You'll be redirected to view the results.",
+        status: "info",
+        duration: 5000,
+        isClosable: true,
+      });
+    } catch (error) {
+      console.error("Error requesting dynamic analysis:", error);
+      toast({
+        title: "Error",
+        description: "Failed to request dynamic analysis. Please try again.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+      setIsDynamicAnalysisRequested(false);
+    }
+  };
 
   const getScoreColor = (score) => {
     if (score < 0.2) return "green";
@@ -199,6 +243,20 @@ const AnalysisReport = ({ analysis, status, taskId }) => {
         </Box>
 
         <Box>
+          {file_type === "exe" && !dynamic_analysis && (
+            <Button
+              leftIcon={<Icon as={FaPlay} />}
+              colorScheme="orange"
+              onClick={handleRequestDynamicAnalysis}
+              isLoading={isDynamicAnalysisRequested}
+              loadingText="Requesting..."
+              size="sm"
+              mr={2}
+            >
+              Run Dynamic Analysis
+            </Button>
+          )}
+
           <Button
             as="a"
             href={`/api/reports/${taskId}`}
@@ -207,11 +265,12 @@ const AnalysisReport = ({ analysis, status, taskId }) => {
             colorScheme="brand"
             variant="outline"
             size="sm"
-            mb={2}
+            mb={{ base: 2, md: 0 }}
             mr={2}
           >
             Download PDF
           </Button>
+
           <Button
             as="a"
             href={`/api/reports/${taskId}?format=json`}
@@ -296,6 +355,7 @@ const AnalysisReport = ({ analysis, status, taskId }) => {
           <Tab>Indicators ({indicators.length})</Tab>
           {exe_details && <Tab>EXE Analysis</Tab>}
           {pdf_details && <Tab>PDF Analysis</Tab>}
+          {dynamic_analysis && <Tab>Dynamic Analysis</Tab>}
         </TabList>
 
         <TabPanels>
@@ -923,6 +983,7 @@ const AnalysisReport = ({ analysis, status, taskId }) => {
                       <AccordionIcon />
                     </AccordionButton>
                   </h2>
+
                   <AccordionPanel pb={4}>
                     {pdf_details.urls && pdf_details.urls.length > 0 ? (
                       <Box
@@ -998,6 +1059,290 @@ const AnalysisReport = ({ analysis, status, taskId }) => {
                     </AccordionPanel>
                   </AccordionItem>
                 )}
+              </Accordion>
+            </TabPanel>
+          )}
+
+          {/* Dynamic Analysis Panel */}
+          {dynamic_analysis && (
+            <TabPanel>
+              <Accordion allowMultiple defaultIndex={[0]}>
+                {/* Suspicious Behaviors */}
+                <AccordionItem>
+                  <h2>
+                    <AccordionButton>
+                      <Box flex="1" textAlign="left" fontWeight="medium">
+                        Suspicious Behaviors (
+                        {dynamic_analysis.suspicious_behaviors?.length || 0})
+                      </Box>
+                      <AccordionIcon />
+                    </AccordionButton>
+                  </h2>
+                  <AccordionPanel pb={4}>
+                    {dynamic_analysis.suspicious_behaviors?.length > 0 ? (
+                      <TableContainer>
+                        <Table variant="simple" size="sm">
+                          <Thead>
+                            <Tr>
+                              <Th>Type</Th>
+                              <Th>Description</Th>
+                              <Th>Severity</Th>
+                            </Tr>
+                          </Thead>
+                          <Tbody>
+                            {dynamic_analysis.suspicious_behaviors.map(
+                              (behavior, idx) => (
+                                <Tr key={idx}>
+                                  <Td>
+                                    {behavior.type}/{behavior.subtype}
+                                  </Td>
+                                  <Td>{behavior.description}</Td>
+                                  <Td>
+                                    <Badge
+                                      colorScheme={
+                                        severityColors[behavior.severity]
+                                      }
+                                    >
+                                      {behavior.severity}
+                                    </Badge>
+                                  </Td>
+                                </Tr>
+                              )
+                            )}
+                          </Tbody>
+                        </Table>
+                      </TableContainer>
+                    ) : (
+                      <Text>No suspicious behaviors detected.</Text>
+                    )}
+                  </AccordionPanel>
+                </AccordionItem>
+
+                {/* Network Activity */}
+                <AccordionItem>
+                  <h2>
+                    <AccordionButton>
+                      <Box flex="1" textAlign="left" fontWeight="medium">
+                        Network Activity (
+                        {dynamic_analysis.network_activity?.length || 0})
+                      </Box>
+                      <AccordionIcon />
+                    </AccordionButton>
+                  </h2>
+                  <AccordionPanel pb={4}>
+                    {dynamic_analysis.network_activity?.length > 0 ? (
+                      <TableContainer>
+                        <Table variant="simple" size="sm">
+                          <Thead>
+                            <Tr>
+                              <Th>Local</Th>
+                              <Th>Remote</Th>
+                              <Th>Status</Th>
+                              <Th>Process ID</Th>
+                            </Tr>
+                          </Thead>
+                          <Tbody>
+                            {dynamic_analysis.network_activity.map(
+                              (conn, idx) => (
+                                <Tr key={idx}>
+                                  <Td>
+                                    {conn.local_address}:{conn.local_port}
+                                  </Td>
+                                  <Td>
+                                    {conn.remote_address
+                                      ? `${conn.remote_address}:${conn.remote_port}`
+                                      : "N/A"}
+                                  </Td>
+                                  <Td>{conn.status}</Td>
+                                  <Td>{conn.pid || "N/A"}</Td>
+                                </Tr>
+                              )
+                            )}
+                          </Tbody>
+                        </Table>
+                      </TableContainer>
+                    ) : (
+                      <Text>No network activity detected.</Text>
+                    )}
+                  </AccordionPanel>
+                </AccordionItem>
+
+                {/* Process Activity */}
+                <AccordionItem>
+                  <h2>
+                    <AccordionButton>
+                      <Box flex="1" textAlign="left" fontWeight="medium">
+                        Process Activity (
+                        {dynamic_analysis.process_activity?.length || 0})
+                      </Box>
+                      <AccordionIcon />
+                    </AccordionButton>
+                  </h2>
+                  <AccordionPanel pb={4}>
+                    {dynamic_analysis.process_activity?.length > 0 ? (
+                      <TableContainer>
+                        <Table variant="simple" size="sm">
+                          <Thead>
+                            <Tr>
+                              <Th>PID</Th>
+                              <Th>Name</Th>
+                              <Th>User</Th>
+                              <Th>Command Line</Th>
+                            </Tr>
+                          </Thead>
+                          <Tbody>
+                            {dynamic_analysis.process_activity.map(
+                              (proc, idx) => (
+                                <Tr key={idx}>
+                                  <Td>{proc.pid}</Td>
+                                  <Td>{proc.name}</Td>
+                                  <Td>{proc.username || "N/A"}</Td>
+                                  <Td>
+                                    <Text noOfLines={1}>
+                                      {proc.command_line
+                                        ? proc.command_line.join(" ")
+                                        : "N/A"}
+                                    </Text>
+                                  </Td>
+                                </Tr>
+                              )
+                            )}
+                          </Tbody>
+                        </Table>
+                      </TableContainer>
+                    ) : (
+                      <Text>No process activity detected.</Text>
+                    )}
+                  </AccordionPanel>
+                </AccordionItem>
+
+                {/* File System Activity */}
+                <AccordionItem>
+                  <h2>
+                    <AccordionButton>
+                      <Box flex="1" textAlign="left" fontWeight="medium">
+                        File System Activity (
+                        {dynamic_analysis.file_system_activity?.length || 0})
+                      </Box>
+                      <AccordionIcon />
+                    </AccordionButton>
+                  </h2>
+                  <AccordionPanel pb={4}>
+                    {dynamic_analysis.file_system_activity?.length > 0 ? (
+                      <TableContainer>
+                        <Table variant="simple" size="sm">
+                          <Thead>
+                            <Tr>
+                              <Th>Path</Th>
+                              <Th>Operation</Th>
+                              <Th>Timestamp</Th>
+                              <Th>Process ID</Th>
+                            </Tr>
+                          </Thead>
+                          <Tbody>
+                            {dynamic_analysis.file_system_activity.map(
+                              (file_op, idx) => (
+                                <Tr key={idx}>
+                                  <Td>
+                                    <Code>{file_op.path}</Code>
+                                  </Td>
+                                  <Td>{file_op.operation}</Td>
+                                  <Td>
+                                    {file_op.timestamp
+                                      ? new Date(
+                                          file_op.timestamp
+                                        ).toLocaleString()
+                                      : "N/A"}
+                                  </Td>
+                                  <Td>{file_op.process_id || "N/A"}</Td>
+                                </Tr>
+                              )
+                            )}
+                          </Tbody>
+                        </Table>
+                      </TableContainer>
+                    ) : (
+                      <Text>No file system activity detected.</Text>
+                    )}
+                  </AccordionPanel>
+                </AccordionItem>
+
+                {/* Registry Activity */}
+                <AccordionItem>
+                  <h2>
+                    <AccordionButton>
+                      <Box flex="1" textAlign="left" fontWeight="medium">
+                        Registry Activity (
+                        {dynamic_analysis.registry_activity?.length || 0})
+                      </Box>
+                      <AccordionIcon />
+                    </AccordionButton>
+                  </h2>
+                  <AccordionPanel pb={4}>
+                    {dynamic_analysis.registry_activity?.length > 0 ? (
+                      <TableContainer>
+                        <Table variant="simple" size="sm">
+                          <Thead>
+                            <Tr>
+                              <Th>Key</Th>
+                              <Th>Operation</Th>
+                              <Th>Value</Th>
+                              <Th>Process ID</Th>
+                            </Tr>
+                          </Thead>
+                          <Tbody>
+                            {dynamic_analysis.registry_activity.map(
+                              (reg_op, idx) => (
+                                <Tr key={idx}>
+                                  <Td>
+                                    <Code>{reg_op.key}</Code>
+                                  </Td>
+                                  <Td>{reg_op.operation}</Td>
+                                  <Td>{reg_op.value || "N/A"}</Td>
+                                  <Td>{reg_op.process_id || "N/A"}</Td>
+                                </Tr>
+                              )
+                            )}
+                          </Tbody>
+                        </Table>
+                      </TableContainer>
+                    ) : (
+                      <Text>No registry activity detected.</Text>
+                    )}
+                  </AccordionPanel>
+                </AccordionItem>
+
+                {/* Execution Details */}
+                <AccordionItem>
+                  <h2>
+                    <AccordionButton>
+                      <Box flex="1" textAlign="left" fontWeight="medium">
+                        Execution Details
+                      </Box>
+                      <AccordionIcon />
+                    </AccordionButton>
+                  </h2>
+                  <AccordionPanel pb={4}>
+                    <SimpleGrid columns={{ base: 1, md: 2 }} spacing={5}>
+                      <Stat>
+                        <StatLabel>Execution Time</StatLabel>
+                        <StatNumber fontSize="lg">
+                          {dynamic_analysis.execution_time?.toFixed(2) || "N/A"}{" "}
+                          seconds
+                        </StatNumber>
+                      </Stat>
+
+                      <Stat>
+                        <StatLabel>Exit Code</StatLabel>
+                        <StatNumber fontSize="lg">
+                          {dynamic_analysis.exit_code !== null
+                            ? dynamic_analysis.exit_code
+                            : "N/A"}
+                        </StatNumber>
+                      </Stat>
+                    </SimpleGrid>
+                  </AccordionPanel>
+                </AccordionItem>
               </Accordion>
             </TabPanel>
           )}
